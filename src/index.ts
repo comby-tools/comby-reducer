@@ -6,7 +6,7 @@ import { parse } from '@iarna/toml'
 // eslint-disable-next-line no-var
 declare var comby: any;
 
-const DEBUG = false
+let DEBUG = false
 
 export interface Match {
     range: Range
@@ -107,9 +107,9 @@ const test = (source: string, command: string): Result => {
         console.log(`[D] Running command: ${command}`)
     }
     try {
-        exec.execSync(command, {stdio: "ignore"}) // ignore "Segmentation fault" output.
+        exec.execSync(command, { stdio: "ignore" }) // ignore "Segmentation fault" output.
     } catch (error) {
-        if (error.status === 139) {
+        if (error.status === 139 || error.status == 134) {
             if (DEBUG) {
                 console.log(`[D] Still crashing: ${error}`)
                 console.log(`[D] Good for ${source}`)
@@ -185,6 +185,8 @@ const main = (): void => {
         console.log(`No file. Invoke like: node reduce.js <file> -- command @@`)
         process.exit(1)
     }
+
+    DEBUG = args.debug
     let input: string
     try {
         input = fs.readFileSync(process.argv[2]).toString()
@@ -196,9 +198,17 @@ const main = (): void => {
 
     const command = process.argv.slice(separatorIndex + 1, process.argv.length).join(' ')
     const transforms = loadRules(args.transformsDir)
-    const result = reduce(input, transforms, command)
+
+    let previous = input
+    let pass = 0
+    do {
+        console.log(`[+] Did pass ${pass} pass`)
+        previous = input
+        input = reduce(input, transforms, command)
+        pass = pass + 1
+    } while (input.length < previous.length)
     console.log('[+] Result:')
-    console.log(`${result}`)
+    console.log(`${input}`)
 }
 
 main()
