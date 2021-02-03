@@ -10,6 +10,10 @@ rewrite='{}'
 match='[:[1]]'
 rewrite='[]'
 
+[blank_brace]
+match='{ }'
+rewrite='{}'
+
 [delete_line]
 match=':[x\n]'
 rewrite=''
