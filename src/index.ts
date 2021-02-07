@@ -195,10 +195,13 @@ const main = (): void => {
         process.exit(1)
     }
 
-
     const command = process.argv.slice(separatorIndex + 1, process.argv.length).join(' ')
-    const transforms = loadRules(args.transformsDir)
+    if (test(input, command) === Result.Bad) {
+        console.log(`Program doesn't crash on this input (no exit status 139 or 134).`)
+        process.exit(1)
+    }
 
+    const transforms = loadRules(args.transformsDir)
     let previous = input
     let pass = 0
     do {
