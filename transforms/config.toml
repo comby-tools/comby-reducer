@@ -1,15 +1,29 @@
 [empty_paren]
 match='(:[1])'
 rewrite='()'
+rule='where nested'
 
 [empty_brace]
 match='{:[1]}'
 rewrite='{}'
+rule='where nested'
 
 [empty_bracket]
 match='[:[1]]'
 rewrite='[]'
+rule='where nested'
 
+[extract_brace_body]
+match=':[x] {:[y]}'
+rewrite=':[y]'
+rule='where nested'
+
+[delete_brace_like]
+match=':[x] {:[y]}'
+rewrite=''
+rule='where nested'
+
+# Helps put blank bodies across newlines on the same line for line deletion.
 [blank_brace]
 match='{ }'
 rewrite='{}'
@@ -28,4 +42,40 @@ rewrite=''
 
 [delete_empty_brace]
 match='{}'
+rewrite=''
+
+[remove_first_paren_element]
+match='(:[1],:[2])'
+rewrite='(:[2])'
+
+[preserve_first_paren_element]
+match='(:[1],:[2])'
+rewrite='(:[1])'
+
+[remove_first_expression_for_comma_sep]
+match=':[1:e],:[2:e]'
+rewrite=':[2]'
+
+[remove_first_expression_for_comma_sep_space]
+match=':[1:e], :[2:e]'
+rewrite=':[2]'
+
+[remove_first_expression_for_semicolon_sep_space]
+match=':[1:e]; :[2:e]'
+rewrite=':[2]'
+
+[remove_first_expression_for_colon_sep]
+match=':[1:e]::[2:e]'
+rewrite=':[2]'
+
+[preserve_first_expression_for_colon_sep]
+match=':[1:e]::[2:e]'
+rewrite=':[1]'
+
+[remove_angle_body]
+match='<:[x.]>'
+rewrite='<>'
+
+[remove_angle]
+match='<:[x.]>'
 rewrite=''
