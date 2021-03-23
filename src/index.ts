@@ -7,6 +7,7 @@ import { parse } from '@iarna/toml'
 declare var comby: any;
 
 let DEBUG = false
+let LANGUAGE = '.generic'
 
 export interface Match {
     range: Range
@@ -36,13 +37,7 @@ export interface Range {
 }
 
 
-export function _match(source: string, matchTemplate: string, matcher?: string, rule?: string): Match[] {
-    if (matcher === undefined) {
-        matcher = '.generic'
-    }
-    if (rule === undefined) {
-        rule = 'where true'
-    }
+export function _match(source: string, matchTemplate: string, matcher: string = LANGUAGE, rule = 'where true'): Match[] {
     return (JSON.parse(comby.match(source, matchTemplate, matcher, rule)) as Match[])
 }
 
@@ -50,13 +45,7 @@ export function _substitute(template: string, environment: Environment): string 
     return comby.substitute(template, JSON.stringify(environment))
 }
 
-export function _rewrite(source: string, matchTemplate: string, rewriteTemplate: string, matcher?: string, rule?: string): string {
-    if (matcher === undefined) {
-        matcher = '.generic'
-    }
-    if (rule === undefined) {
-        rule = 'where true'
-    }
+export function _rewrite(source: string, matchTemplate: string, rewriteTemplate: string, matcher: string = LANGUAGE, rule = 'where true'): string {
     return comby.rewrite(source, matchTemplate, rewriteTemplate, matcher, rule)
 }
 
@@ -86,42 +75,42 @@ const loadRules = (transformsDir: string): Transform[] => {
                 transform.push((value as unknown) as Transform);
             }
         });
-        console.log(`[+] Loaded ${transform.length} transformation rules`);
+        console.error(`[+] Loaded ${transform.length} transformation rules`);
         if (DEBUG) {
-            console.log(`[D] ${JSON.stringify(transform)}`)
+            console.error(`[D] ${JSON.stringify(transform)}`)
         }
         return transform
     } catch (error) {
-        console.log(`[-] Could not parse file in ${transformsDir}: ${error}`)
+        console.error(`[-] Could not parse file in ${transformsDir}: ${error}`)
         throw ""
     }
 }
 
-const test = (source: string, command: string): Result => {
+const test = (source: string, command: string, inFile: string): Result => {
     if (DEBUG) {
-        console.log(`[D] Testing for crash: ${source}`)
+        console.error(`[D] Testing for crash:\n${source}`)
     }
-    fs.writeFileSync('/tmp/in', source);
-    command = command.replace('@@', '/tmp/in')
+    fs.writeFileSync(inFile, source);
+    command = command.replace('@@', inFile)
     if (DEBUG) {
-        console.log(`[D] Running command: ${command}`)
+        console.error(`[D] Running command: ${command}`)
     }
     try {
         exec.execSync(command, { stdio: "ignore" }) // ignore "Segmentation fault" output.
     } catch (error) {
         if (error.status === 139 || error.status == 134) {
             if (DEBUG) {
-                console.log(`[D] Still crashing: ${error}`)
-                console.log(`[D] Good for ${source}`)
+                console.error(`[D] Still crashing: ${error}`)
+                console.error(`[D] Good for ${source}`)
             }
             return Result.Good
         }
         if (DEBUG) {
-            console.log(`[D] Other error: ${error}`)
+            console.error(`[D] Other error: ${error}`)
         }
     }
     if (DEBUG) {
-        console.log(`[D] No crash.`)
+        console.error(`[D] No crash.`)
     }
     return Result.Bad
 }
@@ -132,19 +121,22 @@ const replaceRange = (source: string, { start, end }: Range, replacementFragment
     return before + replacementFragment + after;
 }
 
-const transform = (source: string, transform: Transform, command: string): string | undefined => {
+const transform = (source: string, transform: Transform, command: string, inFile: string): string | undefined => {
     const matches: Match[] = _match(source, transform.match)
     for (const m of matches) {
         const substituted = _substitute(transform.rewrite, m.environment)
         const result = replaceRange(source, m.range, substituted)
-        if (result.length < source.length && test(result, command) === Result.Good) { // length test is redundant if transformations always reduce.
+        if (result.length < source.length && test(result, command, inFile) === Result.Good) { // length test is redundant if transformations always reduce.
+            if (DEBUG) {
+                console.error(`[D] Reduction for ${transform.match} ${transform.rule || ''} -> ${transform.rewrite} @ ${JSON.stringify(m.range)}\n${result}`)
+            }
             return result
         }
     }
     return undefined
 }
 
-const reduce = (current: string, transforms: Transform[], command: string): string => {
+const reduce = (current: string, transforms: Transform[], command: string, inFile: string): string => {
     if (transforms.length === 0) {
         return current // Done.
     }
@@ -153,64 +145,68 @@ const reduce = (current: string, transforms: Transform[], command: string): stri
     let next = undefined
     do {
         previous = next === undefined ? previous : next
-        next = transform(previous, transforms[0], command)
+        next = transform(previous, transforms[0], command, inFile)
     } while (next !== undefined)
 
-    return reduce(previous, transforms.slice(1, transforms.length), command)
+    return reduce(previous, transforms.slice(1, transforms.length), command, inFile)
 }
 
 
 const args = minimist(process.argv.slice(3), {
     default: {
         debug: false,
-        transformsDir: 'transforms',
+        file: '/tmp/in',
+        transforms: 'transforms',
+        language: 'language',
     },
 });
 
 
 const main = (): void => {
     if (process.argv[2] == '--help' || process.argv[2] == '-h' || process.argv[2] == '-help') {
-        console.log(`node reduce.js <file> -- command @@`)
-        console.log('Arg defaults: ', args)
+        console.error(`node reduce.js <file> -- command @@`)
+        console.error('Arg defaults: ', args)
         process.exit(1)
     }
 
     const separatorIndex = process.argv.indexOf('--')
     if (separatorIndex < 0) {
-        console.log('No -- seen. Enter a command like: node reduce.js <file> -- command @@')
+        console.error('No -- seen. Enter a command like: node reduce.js <file-to-reduce> -- command @@')
         process.exit(1)
     }
 
     if (!process.argv[2]) {
-        console.log(`No file. Invoke like: node reduce.js <file> -- command @@`)
+        console.error(`No file. Invoke like: node reduce.js <file-to-reduce> -- command @@`)
         process.exit(1)
     }
 
     DEBUG = args.debug
+    LANGUAGE = args.language
     let input: string
     try {
         input = fs.readFileSync(process.argv[2]).toString()
     } catch (e) {
-        console.log(`Could not read content from ${process.argv[2]}`)
+        console.error(`Could not read content from ${process.argv[2]}`)
         process.exit(1)
     }
 
+    const inFile = args.file
     const command = process.argv.slice(separatorIndex + 1, process.argv.length).join(' ')
-    if (test(input, command) === Result.Bad) {
-        console.log(`Program doesn't crash on this input (no exit status 139 or 134).`)
+    if (test(input, command, inFile) === Result.Bad) {
+        console.error(`Program doesn't crash on this input (no exit status 139 or 134).`)
         process.exit(1)
     }
 
-    const transforms = loadRules(args.transformsDir)
+    const transforms = loadRules(args.transforms)
     let previous = input
     let pass = 0
     do {
-        console.log(`[+] Did pass ${pass} pass`)
+        console.error(`[+] Did pass ${pass} pass`)
         previous = input
-        input = reduce(input, transforms, command)
+        input = reduce(input, transforms, command, inFile)
         pass = pass + 1
     } while (input.length < previous.length)
-    console.log('[+] Result:')
+    console.error('[+] Result:')
     console.log(`${input}`)
 }
 
