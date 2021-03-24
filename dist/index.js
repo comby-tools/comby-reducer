@@ -178,7 +178,7 @@ var main = function () {
     var previous = input;
     var pass = 0;
     do {
-        console.error("[+] Did pass " + pass + " pass");
+        console.error("[+] Did pass " + pass);
         previous = input;
         input = reduce(input, transforms, command, inFile);
         pass = pass + 1;

@@ -10,6 +10,8 @@ var comby = require('../js/comby.js')
 
 let DEBUG = false
 let LANGUAGE = '.generic'
+let EMIT_STEP = false
+let STEP = 0
 
 export interface Match {
     range: Range
@@ -132,6 +134,10 @@ const transform = (source: string, transform: Transform, command: string, inFile
             if (DEBUG) {
                 console.error(`[D] Reduction for ${transform.match} ${transform.rule || ''} -> ${transform.rewrite} @ ${JSON.stringify(m.range)}\n${result}`)
             }
+            if (EMIT_STEP) {
+                fs.writeFileSync(`${STEP.toString().padStart(3, '0')}.step`, result)
+            }
+            STEP = STEP + 1
             return result
         }
     }
@@ -160,7 +166,8 @@ const args = minimist(process.argv.slice(3), {
         file: '/tmp/in',
         transforms: 'transforms',
         language: 'language',
-        version: '1.0.0'
+        version: '1.0.0',
+        step: false,
     },
 });
 
@@ -190,6 +197,7 @@ const main = (): void => {
 
     DEBUG = args.debug
     LANGUAGE = args.language
+    EMIT_STEP = args.step
     let input: string = ''
     try {
         input = fs.readFileSync(process.argv[2]).toString()
@@ -213,7 +221,7 @@ const main = (): void => {
     let previous = input
     let pass = 0
     do {
-        console.error(`[+] Did pass ${pass} pass`)
+        console.error(`[+] Did pass ${pass}`)
         previous = input
         input = reduce(input, transforms, command, inFile)
         pass = pass + 1
