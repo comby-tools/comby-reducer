@@ -12,9 +12,10 @@ to find a smaller example program with `comby-reduce`.
 In [`example/program.c`](./example/program.c) you'll find the program we'll reduce:
 
 ```
+#include<stdio.h>
 #include<string.h>
 
-void main(int argc, char **argv) {
+int main(int argc, char **argv) {
   if (argv[1]) {
       printf("I can't believe it's not butter");
   }
@@ -29,7 +30,7 @@ that we don't need to understand the crash. Let's get started.
 **Step 1**: `cd example` 
 
 Next, we'll use a "pretend compiler" that crashes when it "compiles" our
-program (in reality, our "compiler" crashes when it runs the program, not
+program (in reality, our "compiler" crashes when it runs a valid C program, not
 when actually compiling it, but let's suspend our greater knowledge for now).
 
 **Step 2**: run `./compiler.sh program.c`. to see the compiler crash. You'll see something like this at the end:
@@ -41,8 +42,7 @@ when actually compiling it, but let's suspend our greater knowledge for now).
 
 **Step 3**: run `node ../dist/index.js program.c --file /tmp/in.c --debug --transforms ../transforms -- ./compiler.sh @@`
 
-KomodoHype! Our program is smaller, `comby-reduce` found  that a smaller
-program keeps crashing our "compiler", but without the cruft:
+You should see:
 
 ```
 [+] Loaded 19 transformation rules
@@ -57,16 +57,19 @@ void main() {
 }
 ```
 
-Let's break down some of the command:
+KomodoHype! Our program is smaller. `comby-reduce` found  that a smaller
+valid program keeps crashing our "compiler", but without the cruft.
+
+Let's break down the command invocation:
 
 - The part after `--` is the command we want to run that causes a crash. In our case, `./compiler.sh @@`
   - The `@@` part is substituted with a file containing a program (like `program.c`)
 
 - `--file /tmp/in.c` says that the `@@` we substitute should be `/tmp/in.c`. The `.c` extension may matter if ourcompiler expects this extesion, for example.
 
-- `--transforms ../transforms` points to our directory containing transformations that attempt to reduce the program
+- `--transforms ../transforms` points to our directory containing transformations that attempt to reduce the program.
 
-- `--language .c` says that the language we want to reduce is C-like. This matters so that our transforms can accurately match strictly code blocks and avoid bother with not-actually-code-syntax that come up in comments and strings. This may not be a big deal. You can use `--language .generic` if you have some DSL or smart contract language, or define your own syntax (more on that later).
+- `--language .c` says that the language we want to reduce is C-like. This matters so that our transforms can accurately match strictly code blocks and avoids bothering with not-actually-code-syntax that come up in comments and strings. This may not be a big deal. You can use `--language .generic` if you have some DSL or smart contract language, or define your own syntax (more on that later).
 
 ## Usage 
 
