@@ -15,7 +15,8 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "bin": {
-    "comby-reducer": "dist/index.js"
+    "comby-reducer": "dist/index.js",
+    "comby-reducer-replay": "dist/replay.js"
   },
   "dependencies": {
     "@iarna/toml": "^2.2.5",

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports._rewrite = exports._substitute = exports._match = void 0;
 var fs = require("fs");
 var exec = require("child_process");
 var minimist = require("minimist");
