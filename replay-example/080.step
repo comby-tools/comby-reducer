@@ -1,0 +1,7 @@
+contract C {
+    function f(uint256[] calldata x, uint256 s, uint256 e) external returns (uint256) {
+        (x[s:e]).length;
+    }
+    function gg_s_only() external returns (uint256) {}
+    function gg_e_only() external returns (uint256) {}
+}
