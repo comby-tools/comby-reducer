@@ -14,7 +14,13 @@
   "description": "A reducer for arbitrary language syntax that produces human comprehensible programs. Define declarative transformations with ease.",
   "version": "1.0.0",
   "main": "dist/index.js",
-  "bin": { "comby-reducer": "dist/index.js" },
+  "bin": {
+    "comby-reducer": "dist/index.js"
+  },
+  "dependencies": {
+    "@iarna/toml": "^2.2.5",
+    "minimist": "^1.2.5"
+  },
   "directories": {
     "example": "example"
   },
