@@ -1,10 +1,12 @@
+#!/usr/bin/env node
+
 import fs = require('fs')
 import exec = require('child_process');
 import minimist = require('minimist')
 import { parse } from '@iarna/toml'
 
-// eslint-disable-next-line no-var
-declare var comby: any;
+// credits to the slimmest sag.
+var comby = require('../js/comby.js')
 
 let DEBUG = false
 let LANGUAGE = '.generic'
@@ -158,35 +160,45 @@ const args = minimist(process.argv.slice(3), {
         file: '/tmp/in',
         transforms: 'transforms',
         language: 'language',
+        version: '1.0.0'
     },
 });
 
 
 const main = (): void => {
     if (process.argv[2] == '--help' || process.argv[2] == '-h' || process.argv[2] == '-help') {
-        console.error(`node reduce.js <file> -- command @@`)
+        console.error(`comby-reduce <file> -- command @@`)
         console.error('Arg defaults: ', args)
+        process.exit(1)
+    }
+
+    if (process.argv[2] == '--version' || process.argv[2] == '-v' || process.argv[2] == '-version') {
+        console.log(args.version)
         process.exit(1)
     }
 
     const separatorIndex = process.argv.indexOf('--')
     if (separatorIndex < 0) {
-        console.error('No -- seen. Enter a command like: node reduce.js <file-to-reduce> -- command @@')
+        console.error('No -- seen. Enter a command like: comby-reduce <file-to-reduce> -- command @@')
         process.exit(1)
     }
 
     if (!process.argv[2]) {
-        console.error(`No file. Invoke like: node reduce.js <file-to-reduce> -- command @@`)
+        console.error(`No file. Invoke like: comby-reduce <file-to-reduce> -- command @@`)
         process.exit(1)
     }
 
     DEBUG = args.debug
     LANGUAGE = args.language
-    let input: string
+    let input: string = ''
     try {
         input = fs.readFileSync(process.argv[2]).toString()
     } catch (e) {
         console.error(`Could not read content from ${process.argv[2]}`)
+        process.exit(1)
+    }
+    if (input === '') {
+        console.error('Empty input')
         process.exit(1)
     }
 

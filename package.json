@@ -13,11 +13,11 @@
   "name": "comby-reducer",
   "description": "A reducer for arbitrary language syntax that produces human comprehensible programs. Define declarative transformations with ease.",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "bin": { "comby-reducer": "dist/index.js" },
   "directories": {
     "example": "example"
   },
-  "dependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
