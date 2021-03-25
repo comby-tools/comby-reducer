@@ -13,7 +13,7 @@ npm install -g @comby-tools/comby-reducer
 ```
 
 Alternatively, install `comby-reducer` in a local directory at
-`./node_modules/.bin/comby-reducer`:
+`./node_modules/.bin/comby-reducer`. If you see some warnings just ignore them.
 
 ```
 npm install @comby-tools/comby-reducer
@@ -99,7 +99,7 @@ Let's break down the command invocation:
 
 - `--file /tmp/in.c` says that the `@@` we substitute should be `/tmp/in.c`. The `.c` extension may matter if our compiler expects a file with a `.c` extesion, for example.
 
-- `--language .c` says that the language we want to reduce is C-like. `comby-reducer` uses language definitions to parse input according to some language. This matters so that our transforms can accurately match strictly code blocks and avoids bothering with not-actually-code-syntax that come up in comments and strings. This may not be a big deal. You can use `--language .generic` if you have some DSL or smart contract language. Here's the list of [specific language parsers](https://comby.dev/docs/overview#does-it-work-on-my-language).
+- `--lang .c` says that the language we want to reduce is C-like. `comby-reducer` uses language definitions to parse input according to some language. This matters so that our transforms can accurately match strictly code blocks and avoids bothering with not-actually-code-syntax that come up in comments and strings. This may not be a big deal. You can use `--lang .generic` if you have some DSL or smart contract language. Here's the list of [specific language parsers](https://comby.dev/docs/overview#does-it-work-on-my-language).
 
 - `--transforms ../transforms` points to our directory of transformations that attempt to reduce the program. Transformations are specified with in a [TOML format](https://comby.dev/docs/configuration#toml-format) using [`comby` syntax](https://comby.dev/docs/syntax-reference). See [Usage](#Usage) below for more details.
 
@@ -223,7 +223,7 @@ successful reduction, in the form `<num>.step`, in the current directory. You
 can replay the transformations by running `comby-reducer-replay` in the current
 directory. See more on [comby-reducer-replay](#comby-reducer-replay) below.
 
-**`--language <extension>`** is a flag that determines how the source file is
+**`--lang <extension>`** is a flag that determines how the source file is
   parsed. Using an extension like `.c` or `.go` will make `comby-reducer` parse
   the input according to that language.
 
