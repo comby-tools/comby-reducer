@@ -71,8 +71,8 @@ You'll see something like this at the end:
 
 **Step 4**: Reduce the program
 
-| `comby-reducer program.c --file /tmp/in.c --language .c --transforms ../transforms -- ./compiler.sh @@` |
-|---------------------------------------------------------------------------------------------------------|
+| `comby-reducer program.c --file /tmp/in.c --lang .c --transforms ../transforms -- ./compiler.sh @@` |
+|-----------------------------------------------------------------------------------------------------|
 
 You should see:
 
@@ -192,7 +192,7 @@ We can use this information in a script, and exit with the expected crash code
 to signal a crash. Here's one I used before, called `compile.sh`, that will exit the script with
 signal `139` when it sees the `Internal compiler error` message:
 
-```
+```bash
 #!/bin/bash
 
 RESULT=$(~/solidity/build/solc/solc $1 2>&1)

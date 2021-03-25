@@ -130,7 +130,7 @@ var args = minimist(process.argv.slice(3), {
         debug: false,
         file: '/tmp/in',
         transforms: 'transforms',
-        language: 'language',
+        language: 'lang',
         version: '1.0.0',
         record: false,
     },
