@@ -174,7 +174,7 @@ const args = minimist(process.argv.slice(3), {
 
 const main = (): void => {
     if (process.argv[2] == '--help' || process.argv[2] == '-h' || process.argv[2] == '-help') {
-        console.error(`comby-reduce <file> -- command @@`)
+        console.error(`comby-reduce <file-to-reduce> -- command @@`)
         console.error('Arg defaults: ', args)
         process.exit(1)
     }

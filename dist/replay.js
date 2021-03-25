@@ -90,6 +90,10 @@ process.stdin.on('keypress', function (str, key) {
         }
     }
 });
+if (!fs.existsSync('000.step')) {
+    console.log('Expecting a file 000.step to start replay. Use comby-reducer with --record to generate these files.');
+    process.exit(1);
+}
 console.clear();
 STEP = STEP + 1;
 var diff = getDiff();
