@@ -25,7 +25,10 @@ Let's say you just ran a program that crashed a compiler and want to find a
 smaller example program that triggers the same crash. We'll simulate how to
 find a smaller example program with `comby-reducer`.
 
-**Step 1.** Clone the repository: `git clone https://github.com/comby-tools/comby-reducer`
+**Step 1.** Clone the repository
+
+| `git clone https://github.com/comby-tools/comby-reducer` |
+|----------------------------------------------------------|
 
 
 In [`example/program.c`](./example/program.c) you'll find the program we'll reduce:
@@ -46,16 +49,23 @@ int main(int argc, char **argv) {
 The `memset` statement causes a crash when we run this program. There's some
 junk in there that we don't need to trigger the crash. Let's get started.
 
-**Step 2.** `cd example` 
+**Step 2.** Go into the `example` directory
+
+| `cd example` |
+|--------------|
 
 Next, we'll use a "pretend compiler" that crashes when it "compiles" our
 program (in reality, our "compiler" crashes when it runs a valid C program, not
 when actually compiling it, but we'll suspend our greater knowledge for now).
 
-**Step 3**: run `./compiler.sh program.c`. to see the compiler crash. You'll see something like this at the end:
+**Step 3**: Run this command to crash the compiler
+
+| `./compiler.sh program.c` |
+|---------------------------|
+
+You'll see something like this at the end:
 
 ```bash
-...
 ./compiler.sh: line 7: 41936 Segmentation fault: 11  ./program
 ```
 
@@ -90,7 +100,7 @@ Let's break down the command invocation:
 
 - `--transforms ../transforms` points to our directory of transformations that attempt to reduce the program. Transformations are specified with in a [TOML format](https://comby.dev/docs/configuration#toml-format) using [`comby` syntax](https://comby.dev/docs/syntax-reference). See [Usage](#Usage) below for more details.
 
-## Usage 
+## Usage
 
 ### Transformations
 
@@ -129,7 +139,7 @@ remove elements in such syntax. This transform doesn't have a `rule` part, but
 we could add it.
 
 A last example uses a special form `:[var:e]` which matches "expression-like"
-syntax. 
+syntax.
 
 ```toml
 [remove_first_expression_for_semicolon_sep_space]
