@@ -3,6 +3,8 @@
 A program and data format reducer for arbitrary language syntax. Produces
 human comprehensible output. Define declarative transformations with ease.
 
+https://user-images.githubusercontent.com/888624/112451623-f4262380-8d12-11eb-81d9-a3b645f5b8f8.mp4
+
 ## Install
 
 Install the `comby-reducer` binary on your path with
