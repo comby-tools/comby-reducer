@@ -282,6 +282,8 @@ directory. See more on [comby-reducer-replay](#comby-reducer-replay) below.
 
 </details>
 
+**`--transforms <dir>`** will use `.toml` transform definitions in the specified `dir`. Leaving out `--transforms` will default to using `transforms/config.toml`.
+
 **`--debug`** will emit the reduced program after each step, and the transformation that succeeded to `stderr`.
 
 ### comby-reducer-replay
