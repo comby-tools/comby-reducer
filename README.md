@@ -77,7 +77,7 @@ You'll see something like this at the end:
 You should see:
 
 ```
-[+] Loaded 19 transformation rules
+[+] Loaded 22 transformation rules
 [+] Did pass 0 pass
 [+] Did pass 1 pass
 [+] Did pass 2 pass
