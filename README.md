@@ -69,7 +69,10 @@ You'll see something like this at the end:
 ./compiler.sh: line 7: 41936 Segmentation fault: 11  ./program
 ```
 
-**Step 3**: run `comby-reducer program.c --file /tmp/in.c --language .c --transforms ../transforms -- ./compiler.sh @@`
+**Step 4**: Reduce the program
+
+| `comby-reducer program.c --file /tmp/in.c --language .c --transforms ../transforms -- ./compiler.sh @@` |
+|---------------------------------------------------------------------------------------------------------|
 
 You should see:
 
@@ -104,8 +107,8 @@ Let's break down the command invocation:
 
 ### Transformations
 
-`comby-reducer` makes it easy to write rules for transforming structured
-syntax. A handful of defaults are included in
+`comby-reducer` makes it easy to write rules for transformation using [comby syntax](https://comby.dev/docs/syntax-reference).
+A handful of defaults are included in
 [`transforms/config.toml`](transforms/config.toml) that will probably get you
 very far already. Here are some examples.
 
@@ -119,11 +122,11 @@ rule='where nested'
 This transform matches any content between balanced parentheses (including
 newlines) and deletes the content. The `:[1]` is a variable that can be used in
 the rewrite part. By default, `comby-reducer` will try to apply this
-transformation at the top-level of a file, wherever it sees `(...)`.  The
+transformation at the top-level of a file, wherever it sees `(...)`. The
 `rule='where nested'` tells `comby-reducer` that it should also attempt to
-reduce nested matches of `(...)` inside other `(...)`s. In general, program
-syntax like to use parentheses to nest expressions, so it makes sense to add
-`rule='where nested'.
+reduce nested matches of `(...)` inside other matched `(...)`. In general,
+parentheses are a common syntax to nest expressions in programs, so it makes
+sense to add `rule='where nested'.
 
 Another transform removes the first element from some syntax:
 
@@ -134,15 +137,16 @@ rewrite='(:[1])'
 ```
 
 Program syntax often use call or function-like syntax that comma-separate
-parameters or arguments inside parenthes. This transformation attempts to
-remove elements in such syntax. This transform doesn't have a `rule` part, but
-we could add it.
+parameters or arguments inside parenthes. This transformation attempts to remove
+elements in such syntax. This transform doesn't have a `rule` part, since it
+might not be as fruitful to attempt nested reductions inside of `:[1]` or
+`:[2]`. But, we could easily add it.
 
 A last example uses a special form `:[var:e]` which matches "expression-like"
 syntax.
 
 ```toml
-[remove_first_expression_for_semicolon_sep_space]
+[remove_first_expression_for_colon_sep_space]
 match=':[1:e], :[2:e]'
 rewrite=':[2]'
 ```
@@ -167,14 +171,13 @@ possible to write regular expression holes in `comby-reducer` transforms.**
 
 #### Customize crash criteria with scripts
 
-`comby-reducer` expects a program to exit with signal `139` or `134` to
-consider it a crash. Many programs that crash won't exit with these values,
-however. For example, the [Solidity
-compiler](https://github.com/ethereum/solidity) exits with a signal `1`. Even
-more challenging, the exit signal `1` may mean that the program crashes, or
-that the program doesn't compile (and we want the program to still compile).
-It's not a reliable way to know that the program crashed "for real". What to
-do?
+`comby-reducer` expects a program to exit with signal `139` or `134` to consider
+it a crash. Many programs that crash won't exit with these values, however. For
+example, the [Solidity compiler](https://github.com/ethereum/solidity) exits
+with a signal `1`. Even more challenging, the exit signal `1` may mean that the
+program crashes, or that the program doesn't compile (and we want the program to
+still compile). The exit signal `1` is not a reliable way to know that the
+program crashed "for real". What to do?
 
 It'll depend on your program, but you generally want to define some criteria that
 constitutes a valid crash, and wrap that logic in a script. For Solidity, a valid program
@@ -218,9 +221,7 @@ Some additional command line flags:
 **`--record`** is an optional flag that emits the program at each step of a
 successful reduction, in the form `<num>.step`, in the current directory. You
 can replay the transformations by running `comby-reducer-replay` in the current
-directory. `comby-reducer-replay` is installed along with `comby-reducer` and
-should be available based on how you installed it. See more on
-[comby-reducer-replay](#comby-reducer-replay) below.
+directory. See more on [comby-reducer-replay](#comby-reducer-replay) below.
 
 **`--language <extension>`** is a flag that determines how the source file is
   parsed. Using an extension like `.c` or `.go` will make `comby-reducer` parse
@@ -229,6 +230,7 @@ should be available based on how you installed it. See more on
 
 <details>
   <summary>click to expand the list of accepted extensions</summary>
+
 ```
 .s        Assembly
 .sh       Bash
@@ -275,15 +277,19 @@ should be available based on how you installed it. See more on
 .xml      XML
 .generic  Generic
 ```
+
 </details>
 
 **`--debug`** will emit the reduced program after each step, and the transformation that succeeded to `stderr`.
 
-### `comby-reducer-replay`
+### comby-reducer-replay
 
-`comby-reducer-replay` is the answer to "How was my program reduced?". After
-running `comby-reducer` with `--record`, simply run `comby-reducer-replay` in
-the current directory, and step through the transformed program at each step
+`comby-reducer-replay` is the answer to "How was my program reduced?".
+`comby-reducer-replay` is installed along with `comby-reducer` and should be
+available based on how you installed it.
+
+After running `comby-reducer` with `--record`, simply run `comby-reducer-replay`
+in the current directory, and step through the transformed program at each step
 (left and right arrow keys). Try running `comby-reducer-replay` inside
 [replay-example](./replay-example) to step through a recording of a previous
 crash reduction for a Solidity compiler bug.
@@ -291,7 +297,7 @@ crash reduction for a Solidity compiler bug.
 By default replays will use `git diff` to render changes. To override the
 default, a custom diff command can be entered on the command-line like this:
 
-```
+```bash
 comby-reducer-replay colordiff -y
 ```
 
@@ -303,7 +309,7 @@ Some sensible default flags are included for common diff tools, which you can
 explore by entering only the name of the tool and no other extra command line
 flags:
 
-```
+```bash
 comby-reducer-replay git               # the default
 comby-reducer-replay patdiff           # an enhanced patience diff tool
 comby-reducer-replay colordiff         # colordiff, configured to render side-by-side
@@ -314,7 +320,10 @@ I recommend installing [`patdiff`](https://github.com/janestreet/patdiff) for
 an enhanced viewing experience. `patdiff` simply understands diffs a bit
 better. To get `patdiff`, you'll have to:
 
-- [Install opam](https://opam.ocaml.org/doc/Install.html) with `sh <(curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)`
+- [Install opam](https://opam.ocaml.org/doc/Install.html) with
+
+  `sh <(curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)`
+
 - Run `eval $(opam env)`
 - Run `opam install patdiff`
 
