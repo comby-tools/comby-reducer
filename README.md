@@ -3,6 +3,8 @@
 A program and data format reducer for arbitrary language syntax. Produces
 human comprehensible output. Define declarative transformations with ease.
 
+![reduce-gif-900](https://user-images.githubusercontent.com/888624/112452187-9514de80-8d13-11eb-8d44-939f4ce2b582.gif)
+
 # Quick start
 
 Install the `comby-reducer` binary on your path with
@@ -26,10 +28,6 @@ Install `comby-reducer` in a local directory at
 ```
 npm install @comby-tools/comby-reducer
 ```
-
-![reduce-gif-900](https://user-images.githubusercontent.com/888624/112452187-9514de80-8d13-11eb-8d44-939f4ce2b582.gif)
-
-#
 
 ## Example
 
