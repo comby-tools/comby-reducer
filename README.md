@@ -172,9 +172,14 @@ expressions inside objects, records, or lists.
 transformations on [comby.live](bit.ly/3lOmS4W) to check that a transformation
 behaves the way you want it to.
 
-**Limitations.** Although regular expression matching is possible with `:[...]`
-syntax in [`comby`](https:/github.com/comby-tools/comby), it's **not yet
-possible to write regular expression holes in `comby-reducer` transforms.**
+**Limitations and known issues.** 
+
+- Although regular expression matching is possible with `:[...]` syntax in
+  [`comby`](https:/github.com/comby-tools/comby), it's **not yet possible to
+  write regular expression holes in `comby-reducer` transforms.**
+
+- Some inputs may trigger a stack overflow in `node`. Post a GH issue with the
+  input if you run into this.
 
 ### Tips
 
