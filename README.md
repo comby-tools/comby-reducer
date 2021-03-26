@@ -3,9 +3,7 @@
 A program and data format reducer for arbitrary language syntax. Produces
 human comprehensible output. Define declarative transformations with ease.
 
-![reduce-gif-900](https://user-images.githubusercontent.com/888624/112452187-9514de80-8d13-11eb-8d44-939f4ce2b582.gif)
-
-## Quick start
+# Quick start
 
 Install the `comby-reducer` binary on your path with
 [npm](https://www.npmjs.com/get-npm):
@@ -28,6 +26,10 @@ Install `comby-reducer` in a local directory at
 ```
 npm install @comby-tools/comby-reducer
 ```
+
+![reduce-gif-900](https://user-images.githubusercontent.com/888624/112452187-9514de80-8d13-11eb-8d44-939f4ce2b582.gif)
+
+#
 
 ## Example
 
@@ -135,9 +137,10 @@ transformation at the top-level of a file, wherever it sees `(...)`. The
 `rule='where nested'` tells `comby-reducer` that it should also attempt to
 reduce nested matches of `(...)` inside other matched `(...)`. In general,
 parentheses are a common syntax to nest expressions in programs, so it makes
-sense to add `rule='where nested'.
+sense to add `rule='where nested'`.
 
-Another transform removes the first element from some syntax:
+Another transform preserves the first comma-separated element inside
+parentheses:
 
 ```toml
 [preserve_first_paren_element]

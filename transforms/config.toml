@@ -1,14 +1,14 @@
-[empty_paren]
+[delete_paren_content]
 match='(:[1])'
 rewrite='()'
 rule='where nested'
 
-[empty_brace]
+[delete_brace_content]
 match='{:[1]}'
 rewrite='{}'
 rule='where nested'
 
-[empty_bracket]
+[delete_bracket_content]
 match='[:[1]]'
 rewrite='[]'
 rule='where nested'
