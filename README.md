@@ -1,9 +1,3 @@
-<style>
-th {
-    font-weight: normal;
-}
-</style>
-
 # comby-reducer
 
 A program and data format reducer for arbitrary language syntax. Produces
@@ -43,9 +37,9 @@ find a smaller example program with `comby-reducer`.
 
 **Step 1.** Clone the repository
 
-| `git clone https://github.com/comby-tools/comby-reducer` |
-|----------------------------------------------------------|
-
+```
+git clone https://github.com/comby-tools/comby-reducer
+```
 
 In [`example/program.c`](./example/program.c) you'll find the program we'll reduce:
 
@@ -67,8 +61,9 @@ junk in there that we don't need to trigger the crash. Let's get started.
 
 **Step 2.** Go into the `example` directory
 
-| `cd example` |
-|--------------|
+```
+cd example
+```
 
 Next, we'll use a "pretend compiler" that crashes when it "compiles" our
 program (in reality, our "compiler" crashes when it runs a valid C program, not
@@ -76,19 +71,19 @@ when actually compiling it, but we'll suspend our greater knowledge for now).
 
 **Step 3**: Run this command to crash the compiler
 
-| `./compiler.sh program.c` |
-|---------------------------|
+```bash
+./compiler.sh program.c
+```
 
 You'll see something like this at the end:
 
-```bash
-./compiler.sh: line 7: 41936 Segmentation fault: 11  ./program
-```
+`./compiler.sh: line 7: 41936 Segmentation fault: 11  ./program`
 
 **Step 4**: Reduce the program
 
-| `comby-reducer program.c --file /tmp/in.c --lang .c --transforms ../transforms -- ./compiler.sh @@` |
-|-----------------------------------------------------------------------------------------------------|
+```bash
+comby-reducer program.c --file /tmp/in.c --lang .c --transforms ../transforms -- ./compiler.sh @@
+```
 
 You should see:
 
