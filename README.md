@@ -5,7 +5,7 @@ human comprehensible output. Define declarative transformations with ease.
 
 ![reduce-gif-900](https://user-images.githubusercontent.com/888624/112452187-9514de80-8d13-11eb-8d44-939f4ce2b582.gif)
 
-## Install
+## Quick start
 
 Install the `comby-reducer` binary on your path with
 [npm](https://www.npmjs.com/get-npm):
@@ -14,7 +14,14 @@ Install the `comby-reducer` binary on your path with
 npm install -g @comby-tools/comby-reducer
 ```
 
-Alternatively, install `comby-reducer` in a local directory at
+Invoke it like this:
+
+| `comby-reducer <file-to-reduce> --transforms ./transforms -- <crashing-program> @@` |
+|-------------------------------------------------------------------------------------|
+
+## Alternative local install
+
+Install `comby-reducer` in a local directory at
 `./node_modules/.bin/comby-reducer`. If you see some warnings just ignore them.
 
 ```
@@ -99,7 +106,7 @@ Let's break down the command invocation:
 - The part after `--` is the command we want to run that causes a crash. In our case, `./compiler.sh @@`
   - The `@@` part is substituted with a file containing a program (like `program.c`)
 
-- `--file /tmp/in.c` says that the `@@` we substitute should be `/tmp/in.c`. The `.c` extension may matter if our compiler expects a file with a `.c` extesion, for example.
+- `--file /tmp/in.c` says that the `@@` we substitute should be named `/tmp/in.c`. The `.c` extension may matter if our compiler expects a file with a `.c` extesion, for example. `comby-reducer` will try borrow the extension of the original file but `--file` exists to give you control over the file name that your program sees.
 
 - `--lang .c` says that the language we want to reduce is C-like. `comby-reducer` uses language definitions to parse input according to some language. This matters so that our transforms can accurately match strictly code blocks and avoids bothering with not-actually-code-syntax that come up in comments and strings. This may not be a big deal. You can use `--lang .generic` if you have some DSL or smart contract language. Here's the list of [specific language parsers](https://comby.dev/docs/overview#does-it-work-on-my-language).
 
@@ -282,7 +289,7 @@ directory. See more on [comby-reducer-replay](#comby-reducer-replay) below.
 
 </details>
 
-**`--transforms <dir>`** will use `.toml` transform definitions in the specified `dir`. Leaving out `--transforms` will default to using `transforms/config.toml`.
+**`--transforms <dir>`** will use `.toml` transform definitions in the specified `dir`.
 
 **`--debug`** will emit the reduced program after each step, and the transformation that succeeded to `stderr`.
 

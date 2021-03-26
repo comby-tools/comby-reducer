@@ -6,6 +6,7 @@ var fs = require("fs");
 var exec = require("child_process");
 var minimist = require("minimist");
 var toml_1 = require("@iarna/toml");
+var path = require("path");
 // credits to the slimmest sag.
 var comby = require('../js/comby.js');
 var DEBUG = false;
@@ -128,7 +129,7 @@ var reduce = function (current, transforms, command, inFile) {
 var args = minimist(process.argv.slice(3), {
     default: {
         debug: false,
-        file: '/tmp/in',
+        file: '/tmp/85B6B886',
         transforms: 'transforms',
         language: 'lang',
         version: '1.0.0',
@@ -158,8 +159,10 @@ var main = function () {
     LANGUAGE = args.language;
     RECORD = args.record;
     var input = '';
+    var extension = '';
     try {
         input = fs.readFileSync(process.argv[2]).toString();
+        extension = path.extname(process.argv[2]);
     }
     catch (e) {
         console.error("Could not read content from " + process.argv[2]);
@@ -169,8 +172,13 @@ var main = function () {
         console.error('Empty input');
         process.exit(1);
     }
-    var inFile = args.file;
+    var inFile = args.file === '/tmp/85B6B886' && extension.length > 0
+        ? args.file + "." + extension
+        : args.file;
     var command = process.argv.slice(separatorIndex + 1, process.argv.length).join(' ');
+    if (DEBUG) {
+        console.error("Running command '" + command + "' on file '" + inFile);
+    }
     if (test(input, command, inFile) === Result.Bad) {
         console.error("Program doesn't crash on this input (no exit status 139 or 134).");
         process.exit(1);

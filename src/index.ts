@@ -4,6 +4,7 @@ import fs = require('fs')
 import exec = require('child_process');
 import minimist = require('minimist')
 import { parse } from '@iarna/toml'
+import path = require('path')
 
 // credits to the slimmest sag.
 var comby = require('../js/comby.js')
@@ -163,7 +164,7 @@ const reduce = (current: string, transforms: Transform[], command: string, inFil
 const args = minimist(process.argv.slice(3), {
     default: {
         debug: false,
-        file: '/tmp/in',
+        file: '/tmp/85B6B886',
         transforms: 'transforms',
         language: 'lang',
         version: '1.0.0',
@@ -199,8 +200,10 @@ const main = (): void => {
     LANGUAGE = args.language
     RECORD = args.record
     let input: string = ''
+    let extension: string = ''
     try {
         input = fs.readFileSync(process.argv[2]).toString()
+        extension = path.extname(process.argv[2])
     } catch (e) {
         console.error(`Could not read content from ${process.argv[2]}`)
         process.exit(1)
@@ -210,8 +213,14 @@ const main = (): void => {
         process.exit(1)
     }
 
-    const inFile = args.file
+    const inFile = 
+        args.file === '/tmp/85B6B886' && extension.length > 0
+        ? `${args.file}.${extension}` 
+        : args.file
     const command = process.argv.slice(separatorIndex + 1, process.argv.length).join(' ')
+    if (DEBUG) {
+        console.error(`Running command '${command}' on file '${inFile}`)
+    }
     if (test(input, command, inFile) === Result.Bad) {
         console.error(`Program doesn't crash on this input (no exit status 139 or 134).`)
         process.exit(1)
