@@ -1,3 +1,9 @@
+<style>
+th {
+    font-weight: normal;
+}
+</style>
+
 # comby-reducer
 
 A program and data format reducer for arbitrary language syntax. Produces
@@ -16,8 +22,9 @@ npm install -g @comby-tools/comby-reducer
 
 Invoke it like this:
 
-| `comby-reducer <file-to-reduce> --transforms ./transforms -- <crashing-program> @@` |
-|-------------------------------------------------------------------------------------|
+```
+comby-reducer <file-to-reduce> --transforms ./transforms -- <crashing-program> @@
+```
 
 ## Alternative local install
 
