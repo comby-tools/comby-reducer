@@ -293,7 +293,7 @@ directory. See more on [comby-reducer-replay](#comby-reducer-replay) below.
 
 `--debug` will emit the reduced program after each step, and the transformation that succeeded to `stderr`.
 
-### comby-reducer-replay
+## comby-reducer-replay
 
 `comby-reducer-replay` is the answer to "How was my program reduced?".
 `comby-reducer-replay` is installed along with `comby-reducer` and should be
@@ -340,7 +340,7 @@ better. To get `patdiff`, you'll have to:
 
 And `patdiff` should now be available on your path.
 
-### Development
+## Development
 
 - Install `npm`.
 - Install `npx`.
