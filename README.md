@@ -75,9 +75,7 @@ when actually compiling it, but we'll suspend our greater knowledge for now).
 ./compiler.sh program.c
 ```
 
-You'll see something like this at the end:
-
-`./compiler.sh: line 7: 41936 Segmentation fault: 11  ./program`
+You'll see something like this at the end: `./compiler.sh: line 7: 41936 Segmentation fault: 11  ./program`
 
 **Step 4**: Reduce the program
 
