@@ -13,10 +13,10 @@ var COLORDIFF = exec.spawnSync('which', ['colordiff']).status === 0;
 var DIFF = exec.spawnSync('which', ['diff']).status === 0;
 var PREFERRED_DIFF = process.argv.slice(2).join(' ');
 var command = function (left, right, reverse) {
-    var gitdiff = "git --no-pager diff --color --no-index --unified=10 " + left + " " + right;
-    var patdiff = "patdiff -context 10 -keep-whitespace " + (reverse ? '-reverse' : '') + " " + left + " " + right;
-    var colordiff = "colordiff -y " + (reverse ? right + ' ' + left : left + ' ' + right);
-    var diff = "diff -y " + (reverse ? right + ' ' + left : left + ' ' + right);
+    var gitdiff = "git --no-pager diff --color --no-index --unified=10 ".concat(left, " ").concat(right);
+    var patdiff = "patdiff -context 10 -keep-whitespace ".concat(reverse ? '-reverse' : '', " ").concat(left, " ").concat(right);
+    var colordiff = "colordiff -y ".concat(reverse ? right + ' ' + left : left + ' ' + right);
+    var diff = "diff -y ".concat(reverse ? right + ' ' + left : left + ' ' + right);
     if (PREFERRED_DIFF.match(/^git$/i)) {
         return gitdiff;
     }
@@ -30,7 +30,7 @@ var command = function (left, right, reverse) {
         return diff;
     }
     if (PREFERRED_DIFF.length > 0) {
-        return PREFERRED_DIFF + " " + left + " " + right;
+        return "".concat(PREFERRED_DIFF, " ").concat(left, " ").concat(right);
     }
     if (GITDIFF) {
         return gitdiff;
@@ -47,8 +47,8 @@ var command = function (left, right, reverse) {
     throw "No diff tool detected. Try specifying one on the command line.";
 };
 var getDiff = function (reverse) {
-    var left = STEP.toString().padStart(3, '0') + ".step";
-    var right = (STEP + 1).toString().padStart(3, '0') + ".step";
+    var left = "".concat(STEP.toString().padStart(3, '0'), ".step");
+    var right = "".concat((STEP + 1).toString().padStart(3, '0'), ".step");
     if (!fs.existsSync(right)) {
         console.log(fs.readFileSync(left).toString());
         console.log('------------------------------------------------------------------');

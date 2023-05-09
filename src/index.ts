@@ -85,13 +85,13 @@ const loadRules = (transformsDir: string): Transform[] => {
             console.error(`[D] ${JSON.stringify(transform)}`)
         }
         return transform
-    } catch (error) {
+    } catch (error: any) {
         console.error(`[-] Could not parse file in ${transformsDir}: ${error}`)
         throw ""
     }
 }
 
-const test = (source: string, command: string, inFile: string, stdin: bool): Result => {
+const test = (source: string, command: string, inFile: string, stdin: boolean): Result => {
     if (DEBUG) {
         console.error(`[D] Testing for crash:\n${source}`)
     }
@@ -108,7 +108,7 @@ const test = (source: string, command: string, inFile: string, stdin: bool): Res
         } else {
             exec.execSync(command, { input: source })
         }
-    } catch (error) {
+    } catch (error: any) {
         if (error.status === 139 || error.status == 134) {
             if (DEBUG) {
                 console.error(`[D] Still crashing: ${error}`)
@@ -132,7 +132,7 @@ const replaceRange = (source: string, { start, end }: Range, replacementFragment
     return before + replacementFragment + after;
 }
 
-const transform = (source: string, transform: Transform, command: string, inFile: string, stdin: bool): string | undefined => {
+const transform = (source: string, transform: Transform, command: string, inFile: string, stdin: boolean): string | undefined => {
     const matches: Match[] = _match(source, transform.match)
     for (const m of matches) {
         const substituted = _substitute(transform.rewrite, m.environment)
@@ -151,7 +151,7 @@ const transform = (source: string, transform: Transform, command: string, inFile
     return undefined
 }
 
-const reduce = (current: string, transforms: Transform[], command: string, inFile: string, stdin: bool): string => {
+const reduce = (current: string, transforms: Transform[], command: string, inFile: string, stdin: boolean): string => {
     if (transforms.length === 0) {
         return current // Done.
     }

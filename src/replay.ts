@@ -67,7 +67,7 @@ const getDiff = (reverse?:boolean) : string | undefined => {
 
     try {
         exec.execSync(command(left,right,reverse))
-    } catch (error) {
+    } catch (error: any) {
         console.log(error.stdout.toString())
     }
     return "valid"
