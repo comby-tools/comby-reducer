@@ -85,24 +85,30 @@ const loadRules = (transformsDir: string): Transform[] => {
             console.error(`[D] ${JSON.stringify(transform)}`)
         }
         return transform
-    } catch (error) {
+    } catch (error: any) {
         console.error(`[-] Could not parse file in ${transformsDir}: ${error}`)
         throw ""
     }
 }
 
-const test = (source: string, command: string, inFile: string): Result => {
+const test = (source: string, command: string, inFile: string, stdin: boolean): Result => {
     if (DEBUG) {
         console.error(`[D] Testing for crash:\n${source}`)
     }
-    fs.writeFileSync(inFile, source);
-    command = command.replace('@@', inFile)
+    if (!stdin) {
+        fs.writeFileSync(inFile, source);
+        command = command.replace('@@', inFile)
+    }
     if (DEBUG) {
         console.error(`[D] Running command: ${command}`)
     }
     try {
-        exec.execSync(command, { stdio: "ignore" }) // ignore "Segmentation fault" output.
-    } catch (error) {
+        if (!stdin) {
+            exec.execSync(command, { stdio: "ignore" }) // ignore "Segmentation fault" output.
+        } else {
+            exec.execSync(command, { input: source })
+        }
+    } catch (error: any) {
         if (error.status === 139 || error.status == 134) {
             if (DEBUG) {
                 console.error(`[D] Still crashing: ${error}`)
@@ -126,12 +132,12 @@ const replaceRange = (source: string, { start, end }: Range, replacementFragment
     return before + replacementFragment + after;
 }
 
-const transform = (source: string, transform: Transform, command: string, inFile: string): string | undefined => {
+const transform = (source: string, transform: Transform, command: string, inFile: string, stdin: boolean): string | undefined => {
     const matches: Match[] = _match(source, transform.match)
     for (const m of matches) {
         const substituted = _substitute(transform.rewrite, m.environment)
         const result = replaceRange(source, m.range, substituted)
-        if (result.length < source.length && test(result, command, inFile) === Result.Good) { // length test is redundant if transformations always reduce.
+        if (result.length < source.length && test(result, command, inFile, stdin) === Result.Good) { // length test is redundant if transformations always reduce.
             if (DEBUG) {
                 console.error(`[D] Reduction for ${transform.match} ${transform.rule || ''} -> ${transform.rewrite} @ ${JSON.stringify(m.range)}\n${result}`)
             }
@@ -145,7 +151,7 @@ const transform = (source: string, transform: Transform, command: string, inFile
     return undefined
 }
 
-const reduce = (current: string, transforms: Transform[], command: string, inFile: string): string => {
+const reduce = (current: string, transforms: Transform[], command: string, inFile: string, stdin: boolean): string => {
     if (transforms.length === 0) {
         return current // Done.
     }
@@ -154,10 +160,10 @@ const reduce = (current: string, transforms: Transform[], command: string, inFil
     let next = undefined
     do {
         previous = next === undefined ? previous : next
-        next = transform(previous, transforms[0], command, inFile)
+        next = transform(previous, transforms[0], command, inFile, stdin)
     } while (next !== undefined)
 
-    return reduce(previous, transforms.slice(1, transforms.length), command, inFile)
+    return reduce(previous, transforms.slice(1, transforms.length), command, inFile, stdin)
 }
 
 
@@ -169,6 +175,7 @@ const args = minimist(process.argv.slice(3), {
         language: 'lang',
         version: '1.0.0',
         record: false,
+        stdin: false,
     },
 });
 
@@ -213,15 +220,15 @@ const main = (): void => {
         process.exit(1)
     }
 
-    const inFile = 
+    const inFile =
         args.file === '/tmp/85B6B886' && extension.length > 0
-        ? `${args.file}.${extension}` 
+        ? `${args.file}.${extension}`
         : args.file
     const command = process.argv.slice(separatorIndex + 1, process.argv.length).join(' ')
     if (DEBUG) {
         console.error(`Running command '${command}' on file '${inFile}`)
     }
-    if (test(input, command, inFile) === Result.Bad) {
+    if (test(input, command, inFile, args.stdin) === Result.Bad) {
         console.error(`Program doesn't crash on this input (no exit status 139 or 134).`)
         process.exit(1)
     }
@@ -232,7 +239,7 @@ const main = (): void => {
     do {
         console.error(`[+] Did pass ${pass}`)
         previous = input
-        input = reduce(input, transforms, command, inFile)
+        input = reduce(input, transforms, command, inFile, args.stdin)
         pass = pass + 1
     } while (input.length < previous.length)
     console.error('[+] Result:')
