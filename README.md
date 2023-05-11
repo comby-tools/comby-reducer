@@ -20,6 +20,12 @@ Invoke it like this:
 comby-reducer <file-to-reduce> --transforms ./transforms -- <crashing-program> @@
 ```
 
+To feed the file input to `<crasing-=program>` via `stdin`, invoke it like this instead:
+
+```
+comby-reducer <file-to-reduce> --stdin --transforms ./transforms -- <crashing-program>
+```
+
 ## Alternative local install
 
 Install `comby-reducer` in a local directory at
@@ -105,6 +111,7 @@ Let's break down the command invocation:
 
 - The part after `--` is the command we want to run that causes a crash. In our case, `./compiler.sh @@`
   - The `@@` part is substituted with a file containing a program (like `program.c`)
+  - To feed input from `stdin`, remove the `@@` and add the `--stdin` command line flag.
 
 - `--file /tmp/in.c` says that the `@@` we substitute should be named `/tmp/in.c`. The `.c` extension may matter if our compiler expects a file with a `.c` extesion, for example. `comby-reducer` will try borrow the extension of the original file but `--file` exists to give you control over the file name that your program sees.
 

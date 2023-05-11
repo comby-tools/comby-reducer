@@ -12,7 +12,7 @@
   },
   "name": "@comby-tools/comby-reducer",
   "description": "A program and data format reducer for arbitrary language syntax. Produces human comprehensible output. Define declarative transformations with ease.",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "main": "dist/index.js",
   "bin": {
     "comby-reducer": "dist/index.js",
